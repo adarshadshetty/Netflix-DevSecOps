@@ -1,0 +1,112 @@
+pipeline {
+    agent { label 'jenkinsAgent' }
+    
+    tools {
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        APP_NAME = "netflix-app"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "shettyadarsha"
+        DOCKER_PASS = "docker-cred"
+        TMDB_V3_API_KEY = "f444df6569e01167ffd75110fda47f88"
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage("Clean Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+        stage("Checkout From Git") {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/adarshadshetty/Netflix-DevSecOps.git'
+            }
+        }
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
+                    -Dsonar.projectKey=Netflix'''
+                }
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred'
+                }
+            }
+        }
+        stage("Install Dependencies") {
+            steps {
+                sh "npm install"
+            }
+        }
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage('Create Docker Image & Push to Docker Hub') {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    docker.withRegistry('', DOCKER_PASS) {
+                        def dockerImage = docker.build(imageName, "--build-arg TMDB_V3_API_KEY=${TMDB_V3_API_KEY} .")
+                        dockerImage.push(imageTag)
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+        stage("Trivy Image Scan") {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    sh "trivy image ${imageName}:${imageTag} > trivyimage.txt"
+                }
+            }
+        }
+        stage("Clean Up Docker Images") {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    sh "docker rmi ${imageName}:${imageTag}"
+                    sh "docker rmi ${imageName}"
+                }
+            }
+        }
+    }
+     post {
+     always {
+        emailext attachLog: true,
+            subject: "'${currentBuild.result}'",
+            body: "Project: ${env.JOB_NAME}<br/>" +
+                "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                "URL: ${env.BUILD_URL}<br/>",
+            to: 'adarshadshetty18@gmail.com',                             
+            attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        }
+    }
+}
