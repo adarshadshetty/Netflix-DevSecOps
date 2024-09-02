@@ -1,4 +1,4 @@
-# Netflix Application Deployment.  (DevSecOps)
+# Netflix Application Deployment.  (DevSecOps-Project)
 
 <div align="center">
   <img src="./public/assets/net-1.png" alt="Logo" width="100%" height="100%">
