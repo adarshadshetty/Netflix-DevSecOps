@@ -117,6 +117,198 @@ docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ---> Here Create a new project named as 'Netflix' and setup it Manual. \
 ---> And Also create a webhook , 'publicIPJenkins:8080/sonarqube-webhook/' 
 
+## Jenkind Script 
+```
+pipeline {
+    agent { label 'jenkinsAgent' }
+    
+    tools {
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+    
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        APP_NAME = "netflix-app"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "shettyadarsha"
+        DOCKER_PASS = "docker-cred"
+        TMDB_V3_API_KEY = "f444df6569e01167ffd75110fda47f88"
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage("Clean Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+        stage("Checkout From Git") {
+            steps {
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/adarshadshetty/Netflix-DevSecOps.git'
+            }
+        }
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
+                    -Dsonar.projectKey=Netflix'''
+                }
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-cred'
+                }
+            }
+        }
+        stage("Install Dependencies") {
+            steps {
+                sh "npm install"
+            }
+        }
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        stage('Trivy FS Scan') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage('Create Docker Image & Push to Docker Hub') {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    docker.withRegistry('', DOCKER_PASS) {
+                        def dockerImage = docker.build(imageName, "--build-arg TMDB_V3_API_KEY=${TMDB_V3_API_KEY} .")
+                        dockerImage.push(imageTag)
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+        stage("Trivy Image Scan") {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    sh "trivy image ${imageName}:${imageTag} > trivyimage.txt"
+                }
+            }
+        }
+        stage("Clean Up Docker Images") {
+            steps {
+                script {
+                    def imageName = "${DOCKER_USER}/${APP_NAME}"
+                    def imageTag = "${RELEASE}-${BUILD_NUMBER}"
+                    
+                    sh "docker rmi ${imageName}:${imageTag}"
+                    sh "docker rmi ${imageName}"
+                }
+            }
+        }
+    }
+    post {
+    always {
+        script {
+            def jobName = env.JOB_NAME
+            def buildNumber = env.BUILD_NUMBER
+            def pipelineStatus = currentBuild.result ?: 'UNKNOWN'
+            def bannerColor = pipelineStatus.toUpperCase() == 'SUCCESS' ? 'green' : 'red'
+
+            def body = """
+                <html>
+                <body>
+                <div style="border: 4px solid ${bannerColor}; padding: 10px;">
+                <h2>${jobName} - Build ${buildNumber}</h2>
+                <div style="background-color: ${bannerColor}; padding: 10px;">
+                <h3 style="color: white;">Pipeline Status: ${pipelineStatus.toUpperCase()}</h3>
+                </div>
+                <p>Check the <a href="${BUILD_URL}">console output</a>.</p>
+                </div>
+                </body>
+                </html>
+            """
+
+            emailext (
+                subject: "${jobName} - Build ${buildNumber} - ${pipelineStatus.toUpperCase()}",
+                body: body,
+                to: 'adarshadshetty18@gmail.com',
+                from: 'jenkins@example.com',
+                replyTo: 'jenkins@example.com',
+                mimeType: 'text/html',
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+            )
+        }
+    }
+}
+}
+```
+
+#### Build This Script Manually
+
+###### Build is Success.
+
+<div align="center">
+  <img src="./public/assets/pipelineexecutedsucess.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Jenkins Job Runing in the jenkinsAgent node.
+<div align="center">
+  <img src="./public/assets/jenkinsNodeAgent.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Pipeline Stages
+<div align="center">
+  <img src="./public/assets/pipelineStage.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Dependency Check.
+<div align="center">
+  <img src="./public/assets/DependencyCheck.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### SonarQube Test passed Successfully.
+<div align="center">
+  <img src="./public/assets/sonarqubeTest.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Error in code is 0.
+<div align="center">
+  <img src="./public/assets/sonarqube-1.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Docker Image is Created and Pushed to DockerHub Successfully.
+<div align="center">
+  <img src="./public/assets/dockerPush.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+
+##### Pipeline execution success email sent to you.
+<div align="center">
+  <img src="./public/assets/SuccessEmail.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+
 ### ------------------ Setup Bootstrap Server for eksctl and Setup Kubernetes using eksct----------------------
 
 
@@ -457,6 +649,8 @@ kill 2314   # 2314 is process id
   <img src="./public/assets/prometheus-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+# -----------------------------------------------  Done ---------------------------------------
 
 
 
