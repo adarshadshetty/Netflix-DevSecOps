@@ -117,7 +117,7 @@ docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ---> Here Create a new project named as 'Netflix' and setup it Manual. \
 ---> And Also create a webhook , 'publicIPJenkins:8080/sonarqube-webhook/' 
 
-### ----------------------------------------------------------------- Setup Bootstrap Server for eksctl and Setup Kubernetes using eksct-----------------------------------------------------
+### ------------------ Setup Bootstrap Server for eksctl and Setup Kubernetes using eksct----------------------
 
 
 ###### Create a EC2 instance with t2.large machine with 20GB space storage. (ubuntu)
@@ -177,7 +177,7 @@ eksctl version
 ```
 kubectl get nodes
 ```
-##=========================================== ArgoCD Installation on EKS Cluster and Add EKS Cluster to ArgoCD ===================================
+## ========= ArgoCD Installation on EKS Cluster and Add EKS Cluster to ArgoCD ==========
 
 #### Follow this link --> https://archive.eksworkshop.com/intermediate/290_argocd/install/
 or 
@@ -212,6 +212,28 @@ export ARGO_PWD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jso
 ```
 echo $ARGO_PWD
 ```
+
+# After Login 
+
+###### Use the default cluster
+<div align="center">
+  <img src="./public/assets/argocdDefaultCluster.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Use the git repository of your project
+
+<div align="center">
+  <img src="./public/assets/argocdgithub.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+###### Create a app with default cluster.
+
+<div align="center">
+  <img src="./public/assets/argocdCluster.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
 
 
 
