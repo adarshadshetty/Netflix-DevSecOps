@@ -14,6 +14,11 @@
   <img src="./public/assets/net-4.png" alt="Logo" width="100%" height="100%">
 </div>
 
-### Install Jenkins 
+### Create the Ec2 Instance As shown in below.
+
+<div align="center">
+  <img src="./public/assets/Ec2Instance.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
 
 ```
