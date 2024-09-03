@@ -117,7 +117,7 @@ docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ---> Here Create a new project named as 'Netflix' and setup it Manual. \
 ---> And Also create a webhook , 'publicIPJenkins:8080/sonarqube-webhook/' 
 
-## Jenkind Script 
+## Jenkins Pipeline Script 
 ```
 pipeline {
     agent { label 'jenkinsAgent' }
