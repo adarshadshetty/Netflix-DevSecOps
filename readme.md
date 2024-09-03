@@ -322,10 +322,136 @@ echo $ARGO_PWD
 ######  We will collect metrics from Netflix , Jenkins , K8s , and create dashboard in Grafana.
 
 ### Create the EC2 t2.large ubuntu machine with 30GB memory storage.
+```
+sudo apt update
+sudo apt upgrade -y
+```
 
 ###### Links to download Prometheus, Node_Exporter & black Box exporter . https://prometheus.io/download/
 ###### Links to download Grafana , https://grafana.com/grafana/download
 ###### Other link from video, https://github.com/prometheus/blackbox_exporter
+
+```
+wget https://github.com/prometheus/prometheus/releases/download/v2.54.1/prometheus-2.54.1.linux-amd64.tar.gz
+```
+```
+ls
+```
+Extract the zip file.
+```
+tar -xvf prometheus-2.54.1.linux-amd64.tar.gz
+```
+
+rm tar file
+```
+rm prometheus-2.54.1.linux-amd64.tar.gz
+```
+
+```
+cd prometheus-2.54.1.linux-amd64
+```
+Execute the .prometheus file to install the prometheus.
+```
+./prometheus &
+```
+###### Access the prometheus in 'publicIP:9090'
+
+
+
+
+## Install the Grafana.
+```
+sudo apt-get install -y adduser libfontconfig1 musl
+wget https://dl.grafana.com/enterprise/release/grafana-enterprise_11.2.0_amd64.deb
+sudo dpkg -i grafana-enterprise_11.2.0_amd64.deb
+```
+Install 'musl' if you get Error here.
+
+## Install the BlackBox Exporter
+```
+wget https://github.com/prometheus/blackbox_exporter/releases/download/v0.25.0/blackbox_exporter-0.25.0.linux-amd64.tar.gz
+tar -xvf blackbox_exporter-0.25.0.linux-amd64.tar.gz
+rm blackbox_exporter-0.25.0.linux-amd64.tar.gz
+cd blackbox_exporter-0.25.0.linux-amd64
+./blackbox_exporter
+```
+###### Access the  BlackBox Exporter in 'publicIP:9115'  (For Application Netflix & prometheus.io)
+
+## Install the Node_Exporter in Jenkins Server Machine.
+```
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
+tar -xvf node_exporter-1.8.2.linux-amd64.tar.gz
+rm node_exporter-1.8.2.linux-amd64.tar.gz
+cd node_exporter-1.8.2.linux-amd64
+./node_exporter
+```
+###### Access the  Node_Exporter in 'publicIP:9100'
+
+#### Add the job to a prometheus
+```
+sudo nano prometheus-2.54.1.linux-amd64/prometheus.yml 
+```
+Add job like this.
+<div align="center">
+  <img src="./public/assets/prometheusJob.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+```
+pgrep prometheus
+```
+```
+kill 2314   # 2314 is process id
+```
+```
+./prometheus &
+```
+
+### Now refresh Your prometheus. After it looks like this.
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+# ----------------------------------------------------- Grafana SetUp -------------------------------------------------------------
+### Login to the Grafana  'publicIP:3000' and use 'admin' as the password and username. Change to a new one.
+#### Import the Grafana Dashboard for the following 
+1. Jenkins: Performance and Health Overview
+2. Node Exporter Full  for jenkins
+3. Prometheus Blackbox Exporter  for prometheus and Netflix
+
+   Dashaboard --> Import dashbord --> In ID section give the respective dashbord id.
+   1. Jenkins: Performance and Health Overview   --->  9964
+   2. Node Exporter Full                         --->  1860
+   3. Prometheus Blackbox Exporter               --->  7587
+  
+
+###### Give DataSource as Prometheus in Grafana. It will take data from prometheus for generating graph.
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+<div align="center">
+  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
 
 
 
