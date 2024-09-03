@@ -81,3 +81,35 @@ sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
 ```
 
+# To access the masterJenkins Machine 'publicIP:8080'
+###### We are doing all operation in master node & all operation run in jenkinsNode.
+
+After this install required plugins for this project.
+1. Eclipse
+2. docker
+3. sonarqube scanner
+4. quality gate
+5. dependency check (OWASP)
+6. prometheus
+7. nodejs
+
+----> Restart the jenkins machine after this if required.
+
+#### Add the below mentioned credential in the jenkins machine
+<div align="center">
+  <img src="./public/assets/Credential.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+### Install the SonarQube machine .
+###### Create ubuntu EC2 machine and install the docker on that machine . And Execute the below commnad.
+```
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+```
+
+###### Access this --> PublicIP:9090 and you will get like this. And use 'admin' as a username and password for 1st. And Change to new one.
+
+<div align="center">
+  <img src="./public/assets/SonarQube.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
