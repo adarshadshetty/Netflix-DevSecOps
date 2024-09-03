@@ -177,6 +177,50 @@ eksctl version
 ```
 kubectl get nodes
 ```
+
+# --------------- Install helm on this machine ----------------------------------
+
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
+## Install Node Exporter using Helm.
+1. Install Node Exporter using Helm
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+2. Create a Kubernetes namespace for the Node Exporter:
+```
+kubectl create namespace prometheus-node-exporter
+```
+
+3.kubectl create namespace prometheus-node-exporter
+```
+helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter
+```
+
+#### And check
+```
+kubectl get svc
+```
+You will find ns with prometheus.
+
+
+<div align="center">
+  <img src="./public/assets/kubectlgetsvc-n-prometheus.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+
+or
+
+#### Links to download Prometheus, Node_Exporter & black Box exporter . https://prometheus.io/download/   (Follow this, I am followed this.)
+
+
+
 ## ========= ArgoCD Installation on EKS Cluster and Add EKS Cluster to ArgoCD ==========
 
 #### Follow this link --> https://archive.eksworkshop.com/intermediate/290_argocd/install/
