@@ -21,4 +21,8 @@
 </div>
 <br>
 
-```
+### Open the below mentioned port number open as shown in the image.
+<div align="center">
+  <img src="./public/assets/PortNumberUsed.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
