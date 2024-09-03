@@ -117,4 +117,102 @@ docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
 ---> Here Create a new project named as 'Netflix' and setup it Manual. \
 ---> And Also create a webhook , 'publicIPJenkins:8080/sonarqube-webhook/' 
 
+### ----------------------------------------------------------------- Setup Bootstrap Server for eksctl and Setup Kubernetes using eksct-----------------------------------------------------
+
+
+###### Create a EC2 instance with t2.large machine with 20GB space storage. (ubuntu)
+
+## Install AWS Cli on the above EC2
+```
+sudo su
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+apt install unzip,   $ unzip awscliv2.zip
+sudo ./aws/install
+```
+
+or
+
+```
+sudo yum remove -y aws-cli
+pip3 install --user awscli
+sudo ln -s $HOME/.local/bin/aws /usr/bin/aws
+aws --versio
+```
+##### After this configure the awscli
+```
+aws configure
+```
+Give here ,
+----> AWS Access_Key : ********************
+----> AWS Secret_Key : ********************
+
+## Installing kubectl (Install below CMD 1 By 1)
+
+```
+sudo su
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.27.1/2023-04-19/bin/linux/amd64/kubectl
+ll
+chmod +x ./kubectl  //Gave executable permisions
+mv kubectl /bin   //Because all our executable files are in /bin
+ kubectl version --output=yaml
+```
+
+## Installing  eksctl (Install below CMD 1 By 1)
+```
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+cd /tmp
+ll
+sudo mv /tmp/eksctl /bin
+eksctl version
+```
+## Setup Kubernetes using eksctl
+```
+ eksctl create cluster --name virtualtechbox-cluster \
+--region ap-south-1 \
+--node-type t2.large \
+--nodes 1 \
+```
+
+### Varify !!
+```
+kubectl get nodes
+```
+##=========================================== ArgoCD Installation on EKS Cluster and Add EKS Cluster to ArgoCD ===================================
+
+#### Follow this link --> https://archive.eksworkshop.com/intermediate/290_argocd/install/
+or 
+#### Execute the below command
+```
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.4.7/manifests/install.yaml
+```
+
+```
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
+Wait about 2 minutes for the LoadBalancer creation
+
+
+
+```
+export ARGOCD_SERVER=`kubectl get svc argocd-server -n argocd -o json | jq --raw-output '.status.loadBalancer.ingress[0].hostname'`
+```
+
+###### You will get argocd URL , copy and paste in chrome 'admin' default username.
+```
+echo $ARGOCD_SERVER
+```
+
+```
+export ARGO_PWD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
+```
+
+###### password for login
+```
+echo $ARGO_PWD
+```
+
+
+
 
