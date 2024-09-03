@@ -427,30 +427,38 @@ kill 2314   # 2314 is process id
   
 
 ###### Give DataSource as Prometheus in Grafana. It will take data from prometheus for generating graph.
+
+## Monitoring Netflix Application and Prometheus 
 <div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+  <img src="./public/assets/blackboxAll-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+## Monitoring Only Prometheus.
 <div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+  <img src="./public/assets/blackboxPrometheusio-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+## Monitoring Netflix.
 <div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+  <img src="./public/assets/blackboxnetflix-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+## Monitoring Jenkins
 <div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+  <img src="./public/assets/jenkins-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+## Overall Prometheus Health Monitoring.
 <div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
+  <img src="./public/assets/prometheus-monitor.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
-<div align="center">
-  <img src="./public/assets/prometheus.png" alt="Logo" width="100%" height="100%">
-</div>
-<br>
+
+
 
 
 
