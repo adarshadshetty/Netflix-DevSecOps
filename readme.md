@@ -207,6 +207,11 @@ helm install prometheus-node-exporter prometheus-community/prometheus-node-expor
 kubectl get svc
 ```
 You will find ns with prometheus.
+<div align="center">
+  <img src="./public/assets/kubectlgetns.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
 
 
 <div align="center">
@@ -251,13 +256,23 @@ echo $ARGOCD_SERVER
 ```
 export ARGO_PWD=`kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d`
 ```
-
 ###### password for login
 ```
 echo $ARGO_PWD
 ```
+<div align="center">
+  <img src="./public/assets/argocdgetsecrete.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
 
-# After Login 
+
+
+# After Login (URL in image)
+<div align="center">
+  <img src="./public/assets/kubectlgetsvc-nargocd.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
 
 ###### Use the default cluster
 <div align="center">
@@ -278,6 +293,40 @@ echo $ARGO_PWD
   <img src="./public/assets/argocdCluster.png" alt="Logo" width="100%" height="100%">
 </div>
 <br>
+
+#### Sync the app with force after the app synchronized successfully you will get like this.
+<div align="center">
+  <img src="./public/assets/argocdCluster.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+##### App Pulled the latest netflix image from the DockerHub
+<div align="center">
+  <img src="./public/assets/argocdlatestImagePulled.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+<div align="center">
+  <img src="./public/assets/latestImageArgocd.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+### Now You Can Access the application on   'Node1PublicIP:30007'
+<div align="center">
+  <img src="./public/assets/net-1.png" alt="Logo" width="100%" height="100%">
+</div>
+<br>
+
+
+## --------------------------------------------------- Monitoring ----------------------------------------------------------------------------
+######  We will collect metrics from Netflix , Jenkins , K8s , and create dashboard in Grafana.
+
+### Create the EC2 t2.large ubuntu machine with 30GB memory storage.
+
+###### Links to download Prometheus, Node_Exporter & black Box exporter . https://prometheus.io/download/
+###### Links to download Grafana , https://grafana.com/grafana/download
+###### Other link from video, https://github.com/prometheus/blackbox_exporter
+
 
 
 
